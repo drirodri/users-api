@@ -1,8 +1,12 @@
 import { Exclude, Expose } from 'class-transformer';
+import { UserType } from '../enums/user-type.enum';
 
 export class UserResponseDto {
   @Expose()
   id: number;
+
+  @Expose()
+  userType: UserType;
 
   @Expose()
   name: string;
