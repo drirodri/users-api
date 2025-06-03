@@ -8,12 +8,12 @@
 
 This repository contains a **study project** built with [NestJS](https://github.com/nestjs/nest) to learn and practice:
 
-- 🔐 **Authentication** (Login/Register) - _In Progress_
+- 🔐 **Authentication** (Login/Register) - ✅ **Completed**
 - 🛡️ **Authorization** (Role-based access control) - _Planned_
 - 👤 **User Management** (CRUD operations) - ✅ **Completed**
-- 🔑 **JWT Token handling** - _Planned_
+- 🔑 **JWT Token handling** - ✅ **Completed**
 - 🔒 **Password hashing and security** - ✅ **Completed**
-- 🛠️ **Guards, Pipes, and Interceptors** - _In Progress_
+- 🛠️ **Guards, Pipes, and Interceptors** - ✅ **Completed**
 - 📚 **API Documentation with Swagger** - _Planned_
 
 ## Learning Objectives
@@ -23,9 +23,9 @@ This repository contains a **study project** built with [NestJS](https://github.
 - ✅ Learn database integration with TypeORM
 - ✅ Implement input validation with DTOs
 - ✅ Handle password encryption with bcrypt
-- 🔄 Understand JWT authentication flow
+- ✅ Understand JWT authentication flow
 - 🔄 Implement role-based authorization
-- 🔄 Learn NestJS decorators and guards
+- ✅ Learn NestJS decorators and guards
 - 🔄 Handle validation and error management
 - 🔄 Generate comprehensive API documentation with Swagger
 
@@ -37,11 +37,12 @@ This repository contains a **study project** built with [NestJS](https://github.
 - ✅ **Input Validation** - DTOs with class-validator
 - 🏷️ **User Types** - Enum-based user roles (Admin, User, Moderator)
 - 📝 **Proper Entity Design** - TypeORM entities with relationships
+- 🔐 **JWT Authentication** - Login with email/password
+- 🛡️ **Route Protection** - Authentication guards implemented
+- 🔑 **Token Validation** - JWT token verification and user extraction
 
 ## Planned Features 🔄
 
-- 🔐 JWT authentication system
-- 🛡️ Route protection with Guards
 - 🎯 Role-based access control
 - 📋 Comprehensive error handling
 - 📚 Swagger API documentation
@@ -59,18 +60,25 @@ PATCH  /users/:id       # Update user
 DELETE /users/:id       # Delete user
 ```
 
-### Authentication (Planned)
+### Authentication ✅
 
 ```
-POST   /auth/register   # User registration
-POST   /auth/login      # User login
-POST   /auth/refresh    # Refresh JWT token
+POST   /auth/login      # User login (returns JWT token)
+GET    /auth/me         # Get current user info (protected)
 ```
 
 ## Current Project Structure
 
 ```
 src/
+├── auth/
+│   ├── guards/
+│   │   └── auth.guard.ts         ✅
+│   ├── types/
+│   │   └── auth.types.ts         ✅
+│   ├── auth.controller.ts        ✅
+│   ├── auth.service.ts           ✅
+│   └── auth.module.ts            ✅
 ├── users/
 │   ├── dto/
 │   │   ├── create-user.dto.ts    ✅
@@ -97,35 +105,27 @@ src/
 - **PostgreSQL** - Database ✅
 - **bcrypt** - Password hashing ✅
 - **class-validator** - Input validation ✅
-- **JWT** - JSON Web Tokens (planned)
+- **JWT** - JSON Web Tokens ✅
+- **@nestjs/jwt** - JWT integration ✅
 - **Swagger** - API documentation (planned)
 
-## Current Progress: 50% Complete
+## Current Progress: 75% Complete
 
 ```
 Phase 1: Basic CRUD         ██████████ 100% ✅
 Phase 2: Database Setup     ██████████ 100% ✅
 Phase 3: Validation         ██████████ 100% ✅
-Phase 4: Authentication     ░░░░░░░░░░   0% 🔄
+Phase 4: Authentication     ██████████ 100% ✅
 Phase 5: Authorization      ░░░░░░░░░░   0% 📋
 Phase 6: Documentation      ░░░░░░░░░░   0% 📋
 ```
 
 ## Next Steps
 
-1. **Authentication Implementation** - JWT setup and login/register endpoints
-2. **Route Protection** - Guards and middleware implementation
-3. **Role-based Authorization** - Admin/User access control
-4. **API Documentation** - Swagger integration
-5. **Testing** - Unit and E2E tests
-
-## Study Resources
-
-- [NestJS Authentication Documentation](https://docs.nestjs.com/security/authentication)
-- [JWT Best Practices](https://auth0.com/blog/a-look-at-the-latest-draft-for-jwt-bcp/)
-- [NestJS Guards](https://docs.nestjs.com/guards)
-- [TypeORM Documentation](https://typeorm.io/)
-- [Password Security](https://owasp.org/www-project-cheat-sheets/cheatsheets/Password_Storage_Cheat_Sheet.html)
+1. **Role-based Authorization** - Admin/User access control
+2. **API Documentation** - Swagger integration
+3. **Testing** - Unit and E2E tests
+4. **Enhanced Error Handling** - Custom exception filters
 
 ## Learning Notes
 
@@ -136,8 +136,18 @@ This project demonstrates:
 - ✅ **DTO Pattern** - Request/response validation and transformation
 - ✅ **Service Layer** - Business logic separation
 - ✅ **Password Security** - Proper hashing implementation
-- 🔄 **Authentication Flow** - JWT implementation (in progress)
+- ✅ **Authentication Flow** - JWT implementation with bcrypt validation
+- ✅ **Guards Implementation** - Route protection and user extraction
+- ✅ **TypeScript Types** - Custom interfaces for request handling
 - 📋 **Authorization Patterns** - Role-based access control (planned)
+
+## Authentication Flow
+
+1. **User Registration** - Create user with hashed password
+2. **User Login** - Validate credentials with bcrypt comparison
+3. **JWT Generation** - Create signed token with user payload
+4. **Token Validation** - Guard extracts and validates JWT
+5. **Protected Routes** - Access user data from token payload
 
 ## Commits & Progress Tracking
 
@@ -146,7 +156,11 @@ This project demonstrates:
 - ✅ CRUD operations implementation
 - ✅ Password hashing and validation
 - ✅ User types enum implementation
-- 🔄 JWT authentication setup (next)
+- ✅ JWT authentication setup and implementation
+- ✅ Authentication guards and route protection
+- ✅ Login endpoint with token generation
+- ✅ Protected user info endpoint
+- 🔄 Role-based authorization (next)
 
 ## License
 
