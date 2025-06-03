@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 type AuthInput = {
   email: string;
@@ -18,7 +19,10 @@ type AuthResult = {
 
 @Injectable()
 export class AuthService {
-  constructor(private userService: UsersService) {}
+  constructor(
+    private userService: UsersService,
+    private jwtService: JwtService,
+  ) {}
 
   async authenticate(input: AuthInput): Promise<AuthResult | null> {
     const user = await this.validateUser(input);
@@ -27,11 +31,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    return {
-      accessToken: 'tested_token', // This should be replaced with actual token generation logic
-      userId: user.userId,
-      email: user.email,
-    };
+    return this.signIn(user);
   }
 
   async validateUser(input: AuthInput): Promise<SignInData | null> {
@@ -43,5 +43,16 @@ export class AuthService {
       };
     }
     return null;
+  }
+
+  async signIn(user: SignInData): Promise<AuthResult> {
+    const tokenPayload = { sub: user.userId, email: user.email };
+    const accessToken = await this.jwtService.signAsync(tokenPayload);
+
+    return {
+      accessToken,
+      userId: user.userId,
+      email: user.email,
+    };
   }
 }
