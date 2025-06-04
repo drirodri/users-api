@@ -1,0 +1,19 @@
+{
+  "version": "1",
+  "name": "users-api-requests",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ],
+  "presets": {
+    "requestType": "http",
+    "requestUrl": ""
+  },
+  "vars": {
+    "baseUrl": "http://localhost:5433",
+    "authToken": ""
+  },
+  "size": 0.001293182373046875,
+  "filesCount": 6
+}

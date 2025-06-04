@@ -1,0 +1,24 @@
+meta {
+  name: Create User
+  type: http
+  seq: 1
+}
+
+post {
+  url: /users
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+body:json {
+  {
+    "name": "João Silva",
+    "email": "joao@example.com",
+    "password": "senha123",
+    "role": "USER"
+  }
+}
