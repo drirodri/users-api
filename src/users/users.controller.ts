@@ -8,12 +8,17 @@ import {
   Delete,
   ClassSerializerInterceptor,
   UseInterceptors,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { plainToClass } from 'class-transformer';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/auth/roles.decorator';
+import { UserType } from 'src/common/enums/user-type.enum';
 
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -21,6 +26,8 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserType.ADMIN)
   async create(@Body() createUserDto: CreateUserDto) {
     const user = await this.usersService.create(createUserDto);
     return {
@@ -30,6 +37,8 @@ export class UsersController {
   }
 
   @Get()
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserType.ADMIN)
   async findAll() {
     const users = await this.usersService.findAll();
     return {
@@ -40,6 +49,8 @@ export class UsersController {
   }
 
   @Get(':id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserType.ADMIN)
   async findOne(@Param('id') id: string) {
     const user = await this.usersService.findOne(+id);
     return {
@@ -49,6 +60,7 @@ export class UsersController {
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard)
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     const user = await this.usersService.update(+id, updateUserDto);
     return {
@@ -58,6 +70,8 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserType.ADMIN)
   async remove(@Param('id') id: string) {
     await this.usersService.remove(+id);
     return {
