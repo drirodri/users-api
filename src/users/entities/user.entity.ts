@@ -17,7 +17,7 @@ export class User {
     enum: UserType,
     default: UserType.USER,
   })
-  userType: UserType;
+  role: UserType;
 
   @Column({ length: 100 })
   name: string;
