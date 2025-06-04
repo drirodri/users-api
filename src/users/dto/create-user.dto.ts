@@ -7,7 +7,7 @@ import {
   IsEnum,
   IsOptional,
 } from 'class-validator';
-import { UserType } from '../enums/user-type.enum';
+import { UserType } from '../../common/enums/user-type.enum';
 
 export class CreateUserDto {
   @IsOptional()
