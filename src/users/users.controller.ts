@@ -18,6 +18,7 @@ import { plainToClass } from 'class-transformer';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';
+import { CurrentUser } from 'src/auth/user.decorator';
 import { UserType } from 'src/common/enums/user-type.enum';
 
 @Controller('users')
@@ -60,9 +61,19 @@ export class UsersController {
   }
 
   @Patch(':id')
-  @UseGuards(AuthGuard)
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    const user = await this.usersService.update(+id, updateUserDto);
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserType.ADMIN, UserType.USER)
+  async update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @CurrentUser()
+    currentUser: { userId: string; email: string; role: UserType },
+  ) {
+    const user = await this.usersService.update(
+      +id,
+      updateUserDto,
+      currentUser,
+    );
     return {
       message: 'User updated successfully',
       data: plainToClass(UserResponseDto, user),
