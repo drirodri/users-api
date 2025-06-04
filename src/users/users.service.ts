@@ -1,82 +1,98 @@
 import {
   Injectable,
   NotFoundException,
-  ConflictException,
+  InternalServerErrorException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
-import * as bcrypt from 'bcrypt';
+import { UserType } from '../common/enums/user-type.enum';
+import { UsersRepository } from './repositories/users.repository';
+import { UserValidator } from './validators/user.validator';
+import { CryptoHelper } from '../common/helpers/crypto.helper';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    private readonly usersRepository: UsersRepository,
+    private readonly userValidator: UserValidator,
+    private readonly cryptoHelper: CryptoHelper,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(
-      createUserDto.password,
-      saltRounds,
+    const userExists = await this.usersRepository.existsByEmail(
+      createUserDto.email,
+    );
+    this.userValidator.validateUserDoesNotExist(
+      createUserDto.email,
+      userExists,
     );
 
-    const existingUser = await this.userRepository.findOne({
-      where: { email: createUserDto.email },
-    });
+    const hashedPassword = await this.cryptoHelper.hashPassword(
+      createUserDto.password,
+    );
 
-    if (existingUser) {
-      throw new ConflictException(`User already exists`);
-    }
-
-    const user = this.userRepository.create({
+    return await this.usersRepository.create({
       ...createUserDto,
       password: hashedPassword,
     });
-
-    return await this.userRepository.save(user);
   }
 
   async findAll(): Promise<User[]> {
-    return await this.userRepository.find();
+    try {
+      return await this.usersRepository.findAll();
+    } catch (error) {
+      throw new InternalServerErrorException(`Users not found: ${error}`);
+    }
   }
 
   async findOne(id: number): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id } });
+    const user = await this.usersRepository.findById(id);
     if (!user) {
-      throw new NotFoundException(`User not found`);
+      throw new NotFoundException('User not found');
     }
     return user;
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return await this.userRepository.findOne({ where: { email } });
+    const user = await this.usersRepository.findByEmail(email);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+  async update(
+    id: number,
+    updateUserDto: UpdateUserDto,
+    currentUser?: { userId: string; email: string; role: UserType },
+  ): Promise<User> {
     const user = await this.findOne(id);
 
+    if (currentUser) {
+      this.userValidator.validateUpdatePermissions(
+        id,
+        updateUserDto,
+        currentUser,
+      );
+    }
+
     if (updateUserDto.password) {
-      const saltRounds = 10;
-      updateUserDto.password = await bcrypt.hash(
+      await this.userValidator.validateNewPassword(
         updateUserDto.password,
-        saltRounds,
+        user.password,
+      );
+      updateUserDto.password = await this.cryptoHelper.hashPassword(
+        updateUserDto.password,
       );
     }
 
     Object.assign(user, updateUserDto);
-    return await this.userRepository.save(user);
+    return await this.usersRepository.update(user);
   }
 
   async remove(id: number): Promise<void> {
     const user = await this.findOne(id);
-    await this.userRepository.remove(user);
-  }
-
-  async findUserByEmail(email: string): Promise<User | null> {
-    return await this.userRepository.findOne({ where: { email } });
+    await this.usersRepository.remove(user);
   }
 }
