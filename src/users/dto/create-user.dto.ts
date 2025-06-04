@@ -14,16 +14,16 @@ export class CreateUserDto {
   @IsEnum(UserType, { message: 'userType must be a valid user type' })
   role?: UserType;
 
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'name is required' })
   @IsString()
   name: string;
 
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'email is required' })
   @IsEmail()
   email: string;
 
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: 'password is required' })
+  @IsString({ message: 'password must be a string' })
   @MinLength(6)
   password: string;
 }
