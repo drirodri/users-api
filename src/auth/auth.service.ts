@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { UserType } from 'src/common/enums/user-type.enum';
 
 type AuthInput = {
   email: string;
@@ -10,6 +11,7 @@ type AuthInput = {
 type SignInData = {
   userId: number;
   email: string;
+  role: UserType;
 };
 type AuthResult = {
   accessToken: string;
@@ -40,13 +42,18 @@ export class AuthService {
       return {
         userId: user.id,
         email: user.email,
+        role: user.role,
       };
     }
     return null;
   }
 
   async signIn(user: SignInData): Promise<AuthResult> {
-    const tokenPayload = { sub: user.userId, email: user.email };
+    const tokenPayload = {
+      sub: user.userId,
+      email: user.email,
+      role: user.role,
+    };
     const accessToken = await this.jwtService.signAsync(tokenPayload);
 
     return {
