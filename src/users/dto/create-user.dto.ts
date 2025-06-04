@@ -12,7 +12,7 @@ import { UserType } from '../../common/enums/user-type.enum';
 export class CreateUserDto {
   @IsOptional()
   @IsEnum(UserType, { message: 'userType must be a valid user type' })
-  userType?: UserType;
+  role?: UserType;
 
   @IsNotEmpty()
   @IsString()
