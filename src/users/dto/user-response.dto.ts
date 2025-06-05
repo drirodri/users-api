@@ -14,6 +14,9 @@ export class UserResponseDto {
   @Expose()
   email: string;
 
+  @Expose()
+  role: UserType;
+
   @Exclude()
   password: string;
 

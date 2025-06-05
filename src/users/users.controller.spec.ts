@@ -135,6 +135,40 @@ describe('UsersController', () => {
         ConflictException,
       );
     });
+
+    it('should handle validation errors', async () => {
+      const invalidDto = {
+        name: '',
+        email: 'invalid-email',
+        password: '123',
+        role: 'INVALID_ROLE' as UserType,
+      };
+
+      mockUsersService.create.mockRejectedValue(
+        new ConflictException('Validation failed'),
+      );
+
+      await expect(controller.create(invalidDto)).rejects.toThrow(
+        ConflictException,
+      );
+    });
+
+    it('should handle database connection errors', async () => {
+      const createUserDto: CreateUserDto = {
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'password123',
+        role: UserType.USER,
+      };
+
+      mockUsersService.create.mockRejectedValue(
+        new Error('Database connection failed'),
+      );
+
+      await expect(controller.create(createUserDto)).rejects.toThrow(
+        'Database connection failed',
+      );
+    });
   });
 
   describe('findAll', () => {
@@ -161,6 +195,31 @@ describe('UsersController', () => {
       expect(result.message).toBe('Users retrieved successfully');
       expect(result.data).toEqual([]);
       expect(result.count).toBe(0);
+    });
+
+    it('should handle large datasets', async () => {
+      const largeUserArray = Array.from({ length: 1000 }, (_, i) => ({
+        ...mockUser,
+        id: i + 1,
+        email: `user${i}@example.com`,
+      }));
+
+      mockUsersService.findAll.mockResolvedValue(largeUserArray);
+
+      const result = await controller.findAll();
+
+      expect(result.count).toBe(1000);
+      expect(result.data).toHaveLength(1000);
+    });
+
+    it('should handle service errors', async () => {
+      mockUsersService.findAll.mockRejectedValue(
+        new Error('Database query failed'),
+      );
+
+      await expect(controller.findAll()).rejects.toThrow(
+        'Database query failed',
+      );
     });
   });
 
@@ -193,6 +252,36 @@ describe('UsersController', () => {
       await controller.findOne('123');
 
       expect(mockUsersService.findOne).toHaveBeenCalledWith(123);
+    });
+
+    it('should handle invalid id formats', async () => {
+      mockUsersService.findOne.mockRejectedValue(
+        new NotFoundException('Invalid ID format'),
+      );
+
+      await expect(controller.findOne('invalid-id')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+
+    it('should handle negative ids', async () => {
+      mockUsersService.findOne.mockRejectedValue(
+        new NotFoundException('User not found'),
+      );
+
+      await expect(controller.findOne('-1')).rejects.toThrow(NotFoundException);
+    });
+
+    it('should handle very large ids', async () => {
+      mockUsersService.findOne.mockResolvedValue(null);
+
+      mockUsersService.findOne.mockRejectedValue(
+        new NotFoundException('User not found'),
+      );
+
+      await expect(controller.findOne('999999999')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -272,6 +361,76 @@ describe('UsersController', () => {
         controller.update('999', updateUserDto, mockAdminUser),
       ).rejects.toThrow(NotFoundException);
     });
+
+    it('should handle partial updates', async () => {
+      const partialUpdateDto: UpdateUserDto = {
+        name: 'Only Name Updated',
+        role: UserType.USER,
+      };
+
+      const updatedUser = { ...mockUser, name: 'Only Name Updated' };
+      mockUsersService.update.mockResolvedValue(updatedUser);
+
+      const result = await controller.update(
+        '1',
+        partialUpdateDto,
+        mockCurrentUser,
+      );
+
+      expect(result.data.name).toBe('Only Name Updated');
+      expect(result.data.email).toBe(mockUser.email); // unchanged
+    });
+
+    it('should handle role escalation attempts', async () => {
+      const escalationDto: UpdateUserDto = {
+        name: 'Hacker',
+        role: UserType.ADMIN,
+      };
+
+      mockUsersService.update.mockRejectedValue(
+        new ForbiddenException('Cannot escalate privileges'),
+      );
+
+      await expect(
+        controller.update('1', escalationDto, mockCurrentUser),
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('should handle concurrent update attempts', async () => {
+      mockUsersService.update.mockRejectedValue(
+        new ConflictException('User was modified by another process'),
+      );
+
+      await expect(
+        controller.update(
+          '1',
+          { name: 'New Name', role: UserType.USER },
+          mockCurrentUser,
+        ),
+      ).rejects.toThrow(ConflictException);
+    });
+
+    it('should handle updates with same data', async () => {
+      const sameDataDto: UpdateUserDto = {
+        name: mockUser.name,
+        role: mockUser.role,
+      };
+
+      mockUsersService.update.mockResolvedValue(mockUser);
+
+      const result = await controller.update('1', sameDataDto, mockCurrentUser);
+
+      expect(result.message).toBe('User updated successfully');
+      expect(result.data).toBeDefined();
+      expect(result.data.id).toBe(mockUser.id);
+      expect(result.data.name).toBe(mockUser.name);
+      expect(result.data.email).toBe(mockUser.email);
+      expect(result.data.role).toBe(mockUser.role);
+      expect(result.data.createdAt).toEqual(mockUser.createdAt);
+      expect(result.data.updatedAt).toEqual(mockUser.updatedAt);
+      // Password should be excluded from response
+      expect(result.data.password).toBeUndefined();
+    });
   });
 
   describe('remove', () => {
@@ -298,6 +457,126 @@ describe('UsersController', () => {
       await controller.remove('123');
 
       expect(mockUsersService.remove).toHaveBeenCalledWith(123);
+    });
+
+    it('should handle removal of non-existent user', async () => {
+      mockUsersService.remove.mockRejectedValue(
+        new NotFoundException('User not found'),
+      );
+
+      await expect(controller.remove('999')).rejects.toThrow(NotFoundException);
+    });
+
+    it('should handle removal of admin user', async () => {
+      mockUsersService.remove.mockRejectedValue(
+        new ForbiddenException('Cannot delete admin user'),
+      );
+
+      await expect(controller.remove('2')).rejects.toThrow(ForbiddenException);
+    });
+
+    it('should handle database constraints', async () => {
+      mockUsersService.remove.mockRejectedValue(
+        new ConflictException('User has associated records'),
+      );
+
+      await expect(controller.remove('1')).rejects.toThrow(ConflictException);
+    });
+
+    it('should handle zero id', async () => {
+      mockUsersService.remove.mockRejectedValue(
+        new NotFoundException('Invalid user ID'),
+      );
+
+      await expect(controller.remove('0')).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('Edge Cases', () => {
+    it('should handle empty string parameters', async () => {
+      mockUsersService.findOne.mockRejectedValue(
+        new NotFoundException('Invalid ID'),
+      );
+
+      await expect(controller.findOne('')).rejects.toThrow(NotFoundException);
+    });
+
+    it('should handle invalid/empty data in DTOs', async () => {
+      const invalidDto: CreateUserDto = {
+        name: '',
+        email: '',
+        password: '',
+        role: UserType.USER,
+      };
+
+      mockUsersService.create.mockRejectedValue(
+        new ConflictException('Invalid data: name and email are required'),
+      );
+
+      await expect(controller.create(invalidDto)).rejects.toThrow(
+        ConflictException,
+      );
+    });
+
+    it('should handle special characters in names', async () => {
+      const specialCharDto: CreateUserDto = {
+        name: 'José María Özbek-Çelik',
+        email: 'special@example.com',
+        password: 'password123',
+        role: UserType.USER,
+      };
+
+      const expectedUser = { ...mockUser, ...specialCharDto };
+      mockUsersService.create.mockResolvedValue(expectedUser);
+
+      const result = await controller.create(specialCharDto);
+
+      expect(result.data.name).toBe('José María Özbek-Çelik');
+    });
+  });
+
+  describe('Different User Roles', () => {
+    const mockModerator: User = {
+      ...mockUser,
+      id: 3,
+      role: UserType.MODERATOR,
+      email: 'moderator@example.com',
+    };
+
+    const mockModeratorUser = {
+      userId: '3',
+      email: 'moderator@example.com',
+      role: UserType.MODERATOR,
+    };
+
+    it('should handle moderator operations', async () => {
+      const updateDto: UpdateUserDto = {
+        name: 'Updated by Moderator',
+        role: UserType.USER,
+      };
+
+      const updatedUser = { ...mockUser, name: 'Updated by Moderator' };
+      mockUsersService.update.mockResolvedValue(updatedUser);
+
+      const result = await controller.update('1', updateDto, mockModeratorUser);
+
+      expect(result.data.name).toBe('Updated by Moderator');
+    });
+
+    it('should create moderator users', async () => {
+      const createModeratorDto: CreateUserDto = {
+        name: 'New Moderator',
+        email: 'newmod@example.com',
+        password: 'password123',
+        role: UserType.MODERATOR,
+      };
+
+      const expectedUser = { ...mockModerator, ...createModeratorDto };
+      mockUsersService.create.mockResolvedValue(expectedUser);
+
+      const result = await controller.create(createModeratorDto);
+
+      expect(result.data.role).toBe(UserType.MODERATOR);
     });
   });
 });
