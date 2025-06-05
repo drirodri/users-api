@@ -5,13 +5,13 @@ meta {
 }
 
 post {
-  url: /users
+  url: {{baseUrl}}/users
   body: json
   auth: bearer
 }
 
 auth:bearer {
-  token: {{authToken}}
+  token: {{adminToken}}
 }
 
 body:json {
@@ -19,6 +19,6 @@ body:json {
     "name": "João Silva",
     "email": "joao@example.com",
     "password": "senha123",
-    "role": "USER"
+    "role": "user"
   }
 }

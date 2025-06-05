@@ -5,11 +5,11 @@ meta {
 }
 
 delete {
-  url: /users/2
+  url: {{baseUrl}}/users/2
   body: none
   auth: bearer
 }
 
 auth:bearer {
-  token: {{authToken}}
+  token: {{adminToken}}
 }

@@ -10,10 +10,6 @@
     "requestType": "http",
     "requestUrl": ""
   },
-  "vars": {
-    "baseUrl": "http://localhost:5433",
-    "authToken": ""
-  },
-  "size": 0.001293182373046875,
-  "filesCount": 6
+  "size": 0.0018358230590820312,
+  "filesCount": 9
 }

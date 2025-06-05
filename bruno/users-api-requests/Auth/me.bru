@@ -5,11 +5,11 @@ meta {
 }
 
 get {
-  url: /auth/me
+  url: {{baseUrl}}/auth/me
   body: none
   auth: bearer
 }
 
 auth:bearer {
-  token: {{authToken}}
+  token: {{adminToken}}
 }
