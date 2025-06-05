@@ -30,11 +30,7 @@ export class AuthGuard implements CanActivate {
       };
       return true;
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error('Token verification failed:', error.message);
-      } else {
-        console.error('Token verification failed:', String(error));
-      }
+      console.error('Token verification error:', error);
       throw new UnauthorizedException('Invalid token');
     }
   }
