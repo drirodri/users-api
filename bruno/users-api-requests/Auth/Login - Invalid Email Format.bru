@@ -1,0 +1,18 @@
+meta {
+  name: Login - Invalid Email Format
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{baseUrl}}/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "invalid-email-format",
+    "password": "password123"
+  }
+}

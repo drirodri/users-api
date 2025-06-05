@@ -1,0 +1,24 @@
+meta {
+  name: Create Moderator User - Success
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/users
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+body:json {
+  {
+    "name": "Maria Moderadora",
+    "email": "maria.mod@example.com",
+    "password": "moderator123",
+    "role": "moderator"
+  }
+}

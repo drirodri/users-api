@@ -1,0 +1,24 @@
+meta {
+  name: Create User - User Role Forbidden
+  type: http
+  seq: 16
+}
+
+post {
+  url: {{baseUrl}}/users
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{userToken}}
+}
+
+body:json {
+  {
+    "name": "Test User",
+    "email": "forbidden@example.com",
+    "password": "password123",
+    "role": "user"
+  }
+}

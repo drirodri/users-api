@@ -1,11 +1,11 @@
 meta {
-  name: Update User
+  name: Update User - Not Found
   type: http
-  seq: 4
+  seq: 17
 }
 
 patch {
-  url: {{baseUrl}}/users/3
+  url: {{baseUrl}}/users/999
   body: json
   auth: bearer
 }
@@ -16,7 +16,6 @@ auth:bearer {
 
 body:json {
   {
-    "name": "João Silva Atualizado",
-    "role": "moderator"
+    "name": "Non-existent User"
   }
 }

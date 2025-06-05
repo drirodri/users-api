@@ -1,0 +1,15 @@
+meta {
+  name: Delete User - User Forbidden
+  type: http
+  seq: 22
+}
+
+delete {
+  url: {{baseUrl}}/users/1
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{userToken}}
+}

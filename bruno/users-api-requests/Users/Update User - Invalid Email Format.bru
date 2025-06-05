@@ -1,0 +1,21 @@
+meta {
+  name: Update User - Invalid Email Format
+  type: http
+  seq: 20
+}
+
+patch {
+  url: {{baseUrl}}/users/6
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{userToken}}
+}
+
+body:json {
+  {
+    "email": "invalid-email-format"
+  }
+}

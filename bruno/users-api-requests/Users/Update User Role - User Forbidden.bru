@@ -1,0 +1,21 @@
+meta {
+  name: Update User Role - User Forbidden
+  type: http
+  seq: 18
+}
+
+patch {
+  url: {{baseUrl}}/users/1
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{userToken}}
+}
+
+body:json {
+  {
+    "role": "admin"
+  }
+}

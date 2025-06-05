@@ -1,0 +1,22 @@
+meta {
+  name: Update User Profile - Success
+  type: http
+  seq: 8
+}
+
+patch {
+  url: {{baseUrl}}/users/6
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{userToken}}
+}
+
+body:json {
+  {
+    "name": "João Silva Updated",
+    "email": "joao.updated@example.com"
+  }
+}

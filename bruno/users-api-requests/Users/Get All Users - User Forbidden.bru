@@ -1,0 +1,15 @@
+meta {
+  name: Get All Users - User Forbidden
+  type: http
+  seq: 23
+}
+
+get {
+  url: {{baseUrl}}/users
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{userToken}}
+}

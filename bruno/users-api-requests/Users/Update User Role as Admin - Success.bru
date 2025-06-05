@@ -1,0 +1,21 @@
+meta {
+  name: Update User Role as Admin - Success
+  type: http
+  seq: 9
+}
+
+patch {
+  url: {{baseUrl}}/users/6
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+body:json {
+  {
+    "role": "moderator"
+  }
+}

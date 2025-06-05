@@ -1,0 +1,17 @@
+meta {
+  name: Login - Missing Email
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "password": "password123"
+  }
+}

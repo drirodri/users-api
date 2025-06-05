@@ -1,7 +1,7 @@
 meta {
-  name: Create User
+  name: Create User - Missing Required Fields
   type: http
-  seq: 1
+  seq: 12
 }
 
 post {
@@ -16,9 +16,6 @@ auth:bearer {
 
 body:json {
   {
-    "name": "João Silva",
-    "email": "joao@example.com",
-    "password": "senha123",
-    "role": "user"
+    "name": "Test User"
   }
 }
