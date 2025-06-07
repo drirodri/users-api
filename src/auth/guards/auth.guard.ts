@@ -29,8 +29,7 @@ export class AuthGuard implements CanActivate {
         role: tokenPayload.role,
       };
       return true;
-    } catch (error: unknown) {
-      console.error('Token verification error:', error);
+    } catch {
       throw new UnauthorizedException('Invalid token');
     }
   }
