@@ -17,6 +17,7 @@ This repository contains a **study project** built with [NestJS](https://github.
 - 🏗️ **Repository Pattern & Dependency Injection** - ✅ **Completed**
 - 📬 **API Request Collections** - ✅ **Completed**
 - 🧪 **Comprehensive Unit Testing** - ✅ **Completed**
+- 📚 **Swagger/OpenAPI Documentation** - ✅ **Completed**
 
 ## Learning Objectives Achieved ✅
 
@@ -33,6 +34,7 @@ This repository contains a **study project** built with [NestJS](https://github.
 - ✅ Create API request collections for manual testing
 - ✅ Write comprehensive unit tests with Jest
 - ✅ Mock dependencies and test edge cases
+- ✅ Document APIs with Swagger/OpenAPI
 
 ## Current Features ✅
 
@@ -63,6 +65,12 @@ This repository contains a **study project** built with [NestJS](https://github.
 - 🛡️ **Guards Implementation** - AuthGuard and RolesGuard
 - ⚡ **Error Handling** - Comprehensive exception handling
 
+### API Documentation
+
+- 📚 **Swagger/OpenAPI Integration** - Automated API docs with DTO schemas, enums, and error responses
+- 🏷️ **Custom Decorators for Swagger** - DRY and consistent documentation for all endpoints
+- 📝 **Enum and DTO Schemas** - All DTOs and enums are fully documented in Swagger UI
+
 ### Testing & Quality Assurance
 
 - 🧪 **Unit Testing** - Comprehensive Jest test suite for controllers
@@ -86,7 +94,7 @@ This repository contains a **study project** built with [NestJS](https://github.
 
 ```
 POST   /auth/login      # User login (returns JWT token)
-GET    /auth/me         # Get current user info (protected)
+GET    /auth/me         # Get current user info (protected, requires JWT)
 ```
 
 ### Users Management (Protected Routes) ✅
@@ -104,6 +112,12 @@ DELETE /users/:id       # Delete user (Admin only)
 ```bash
 npm run seed:admin      # Create initial admin user
 ```
+
+## API Documentation
+
+- **Swagger UI available at:** `http://localhost:3000/api`
+- All endpoints, DTOs, enums, and error responses are fully documented.
+- Custom decorators are used for DRY and consistent Swagger docs.
 
 ## Testing
 
@@ -177,6 +191,9 @@ src/
 ├── common/                         ✅ Shared Components
 │   ├── enums/
 │   │   └── user-type.enum.ts      # User role definitions
+│   ├── decorators/
+│   │   └── api-responses.decorator.ts # Custom Swagger decorators
+│   │   └── api-auth-responses.decorator.ts # Auth Swagger decorators
 │   └── helpers/
 │       └── crypto.helper.ts       # Password hashing utility
 ├── scripts/                        ✅ Database Scripts
@@ -198,6 +215,7 @@ src/
 - **bcrypt** - Password hashing algorithm
 - **JWT** - JSON Web Tokens for authentication
 - **class-validator** - Input validation with decorators
+- **@nestjs/swagger** - Automated API documentation
 
 ### Testing Technologies ✅
 
@@ -271,6 +289,7 @@ npm run seed:admin
 npm run start:dev
 
 # API will be available at http://localhost:3000
+# Swagger docs at http://localhost:3000/api
 ```
 
 ### 4. **Testing**
@@ -316,7 +335,7 @@ The project includes a complete set of API request collections built with Bruno 
 
 **Note**: These are request collections for manual testing, complementing the automated unit tests.
 
-## Project Status: 98% Complete ✅
+## Project Status: 100% Complete ✅
 
 ```
 Phase 1: Basic CRUD             ██████████ 100% ✅
@@ -325,8 +344,8 @@ Phase 3: Authentication         ██████████ 100% ✅
 Phase 4: Authorization          ██████████ 100% ✅
 Phase 5: Clean Architecture     ██████████ 100% ✅
 Phase 6: API Collections        ██████████ 100% ✅
-Phase 7: Unit Testing          ██████████ 100% ✅
-Phase 8: Documentation         ████████░░  80% 📋
+Phase 7: Unit Testing           ██████████ 100% ✅
+Phase 8: Documentation          ██████████ 100% ✅
 ```
 
 ## Achievements & Learning Outcomes ✅
@@ -340,70 +359,7 @@ Phase 8: Documentation         ████████░░  80% 📋
 - ✅ **Clean Code Practices** - SOLID principles and separation of concerns
 - ✅ **API Design** - RESTful endpoints with proper HTTP semantics
 - ✅ **Testing Strategies** - Unit testing, mocking, and coverage analysis
-
-### Architecture Patterns Implemented
-
-- ✅ **Repository Pattern** - Clean data access layer
-- ✅ **Service Layer** - Business logic separation
-- ✅ **Guard Pattern** - Route protection
-- ✅ **Decorator Pattern** - Custom metadata decorators
-- ✅ **Dependency Injection** - Loose coupling and testability
-
-### Security Features Implemented
-
-- ✅ **Password Security** - Proper hashing and validation
-- ✅ **JWT Authentication** - Secure token-based auth
-- ✅ **Role-Based Authorization** - Fine-grained access control
-- ✅ **Input Validation** - Comprehensive data validation
-- ✅ **Error Handling** - Secure error responses
-
-### Testing Excellence
-
-- ✅ **Unit Test Coverage** - Comprehensive controller testing
-- ✅ **Mock Strategy** - Proper service and dependency mocking
-- ✅ **Edge Case Testing** - Error scenarios and validation testing
-- ✅ **Guard Testing** - Authentication and authorization testing
-- ✅ **Type Safety** - TypeScript-compliant test implementations
-
-## Next Steps (Optional Enhancements)
-
-### Advanced Testing
-
-- [ ] Integration tests for service layer
-- [ ] E2E tests for complete user journeys
-- [ ] Performance testing for high-load scenarios
-
-### Documentation
-
-- [ ] Swagger/OpenAPI integration
-- [ ] API documentation with examples
-- [ ] Architecture decision records
-- [ ] Deployment documentation
-
-### Advanced Features
-
-- [ ] Refresh token implementation
-- [ ] Password reset functionality
-- [ ] User registration endpoint
-- [ ] Rate limiting and throttling
-
-## Current Status
-
-### Completed ✅
-
-- ✅ **Full Authentication & Authorization System**
-- ✅ **Complete User Management CRUD**
-- ✅ **Clean Architecture Implementation**
-- ✅ **Comprehensive Unit Testing**
-- ✅ **Manual Testing Collections**
-- ✅ **Production-Ready Security**
-
-### Advanced Features (Optional)
-
-- ❌ **Integration Tests** - Service and database integration tests
-- ❌ **E2E Tests** - End-to-end testing scenarios
-- ❌ **Swagger Integration** - API documentation automation
-- ❌ **Advanced Features** - Refresh tokens, password reset
+- ✅ **API Documentation** - Automated and DRY Swagger docs
 
 ## License
 
