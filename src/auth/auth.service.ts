@@ -13,7 +13,7 @@ type SignInData = {
   email: string;
   role: UserType;
 };
-type AuthResult = {
+export type AuthResult = {
   accessToken: string;
   userId: number;
   email: string;

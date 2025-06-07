@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -18,7 +19,7 @@ import { AuthModule } from './auth/auth.module';
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
       entities: [User],
-      synchronize: true, // Apenas para desenvolvimento
+      synchronize: true,
       logging: true,
     }),
     UsersModule,
