@@ -230,10 +230,9 @@ describe('UsersController', () => {
       const result = await controller.findOne('1');
 
       expect(mockUsersService.findOne).toHaveBeenCalledWith(1);
-      expect(result.message).toBe('User retrieved successfully');
-      expect(result.data).toBeDefined();
-      expect(result.data.email).toBe(mockUser.email);
-      expect(result.data.name).toBe(mockUser.name);
+      expect(result).toBeDefined();
+      expect(result.email).toBe(mockUser.email);
+      expect(result.name).toBe(mockUser.name);
     });
 
     it('should throw NotFoundException when user not found', async () => {
