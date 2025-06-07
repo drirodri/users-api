@@ -54,7 +54,10 @@ export class UsersController {
   @Roles(UserType.ADMIN)
   async create(@Body() createUserDto: CreateUserDto) {
     const user = await this.usersService.create(createUserDto);
-    return plainToClass(UserResponseDto, user);
+    return {
+      message: 'User created successfully',
+      data: plainToClass(UserResponseDto, user),
+    };
   }
 
   @ApiOperation({
@@ -110,7 +113,10 @@ export class UsersController {
       updateUserDto,
       currentUser,
     );
-    return plainToClass(UserResponseDto, user);
+    return {
+      message: 'User updated successfully',
+      data: plainToClass(UserResponseDto, user),
+    };
   }
 
   @ApiOperation({
