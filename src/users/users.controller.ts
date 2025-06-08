@@ -88,7 +88,10 @@ export class UsersController {
   @Roles(UserType.ADMIN)
   async findOne(@Param('id') id: string) {
     const user = await this.usersService.findOne(+id);
-    return plainToClass(UserResponseDto, user);
+    return {
+      message: 'User retrieved successfully',
+      data: plainToClass(UserResponseDto, user),
+    };
   }
 
   @ApiOperation({
@@ -132,6 +135,7 @@ export class UsersController {
     await this.usersService.remove(+id);
     return {
       message: 'User removed successfully',
+      data: null,
     };
   }
 }

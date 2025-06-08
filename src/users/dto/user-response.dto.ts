@@ -7,10 +7,6 @@ export class UserResponseDto {
   @Expose()
   id: number;
 
-  @ApiProperty({ enum: UserType })
-  @Expose()
-  userType: UserType;
-
   @ApiProperty()
   @Expose()
   name: string;

@@ -173,7 +173,9 @@ describe('AppController (e2e)', () => {
       .set('Authorization', `Bearer ${adminToken}`)
       .expect(200);
 
-    expect(res.body).toHaveProperty('email', 'admin@example.com');
+    const body = res.body as UserApiResponse;
+    expect(body).toHaveProperty('data');
+    expect(body.data).toHaveProperty('email', 'admin@example.com');
   });
 
   it('/users/:id (GET) - not found', async () => {
@@ -278,6 +280,8 @@ describe('AppController (e2e)', () => {
       if (!refreshTokenCookie) {
         throw new Error('refreshTokenCookie is undefined');
       }
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const refreshRes = await request(app.getHttpServer())
         .post('/auth/refresh')

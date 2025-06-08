@@ -231,8 +231,10 @@ describe('UsersController', () => {
 
       expect(mockUsersService.findOne).toHaveBeenCalledWith(1);
       expect(result).toBeDefined();
-      expect(result.email).toBe(mockUser.email);
-      expect(result.name).toBe(mockUser.name);
+      expect(result.message).toBe('User retrieved successfully');
+      expect(result.data).toBeDefined();
+      expect(result.data.email).toBe(mockUser.email);
+      expect(result.data.name).toBe(mockUser.name);
     });
 
     it('should throw NotFoundException when user not found', async () => {
@@ -440,6 +442,7 @@ describe('UsersController', () => {
 
       expect(mockUsersService.remove).toHaveBeenCalledWith(1);
       expect(result.message).toBe('User removed successfully');
+      expect(result.data).toBe(null);
     });
 
     it('should throw NotFoundException when user to delete not found', async () => {
