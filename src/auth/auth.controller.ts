@@ -5,7 +5,8 @@ import {
   HttpCode,
   HttpStatus,
   Post,
-  Request,
+  Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -15,7 +16,13 @@ import { ApiTags } from '@nestjs/swagger';
 import {
   ApiLoginOperation,
   ApiMeOperation,
+  ApiRefreshTokenOperation,
 } from '../common/decorators/api-auth-responses.decorator';
+import {
+  Request as ExpressRequest,
+  Response as ExpressResponse,
+} from 'express';
+import { AUTH_CONFIG } from './config/auth.config';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -25,14 +32,59 @@ export class AuthController {
   @ApiLoginOperation()
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  login(@Body() input: { email: string; password: string }) {
-    return this.authService.authenticate(input);
+  async login(
+    @Body() input: { email: string; password: string },
+    @Res() res: ExpressResponse,
+  ) {
+    const result = await this.authService.authenticate(input);
+
+    if (!result) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    res.cookie(
+      'refreshToken',
+      result.refreshToken,
+      AUTH_CONFIG.REFRESH_COOKIE_OPTIONS,
+    );
+
+    return res.json({
+      accessToken: result.accessToken,
+      userId: result.userId,
+      email: result.email,
+    });
   }
 
   @ApiMeOperation()
   @UseGuards(AuthGuard)
   @Get('me')
-  getUserInfo(@Request() request: RequestWithUser) {
+  getUserInfo(@Req() request: RequestWithUser) {
     return request.user;
+  }
+
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  @ApiRefreshTokenOperation()
+  async refresh(@Req() req: ExpressRequest, @Res() res: ExpressResponse) {
+    const cookies = req.cookies as Record<string, string> | undefined;
+    const refreshToken = cookies?.refreshToken;
+
+    if (!refreshToken) {
+      return res.status(401).json({ message: 'No refresh token provided' });
+    }
+
+    try {
+      const result = await this.authService.refresh(refreshToken);
+
+      res.cookie(
+        'refreshToken',
+        result.refreshToken,
+        AUTH_CONFIG.REFRESH_COOKIE_OPTIONS,
+      );
+
+      return res.json({ accessToken: result.accessToken });
+    } catch {
+      return res.status(401).json({ message: 'Invalid refresh token' });
+    }
   }
 }

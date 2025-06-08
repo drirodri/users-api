@@ -95,4 +95,15 @@ export class UsersService {
     const user = await this.findOne(id);
     await this.usersRepository.remove(user);
   }
+
+  async saveRefreshToken(userId: number, refreshToken: string): Promise<void> {
+    const user = await this.findOne(userId);
+    user.refreshToken = refreshToken;
+    await this.usersRepository.update(user);
+  }
+
+  async getRefreshToken(userId: number): Promise<string | null> {
+    const user = await this.findOne(userId);
+    return user.refreshToken ?? null;
+  }
 }

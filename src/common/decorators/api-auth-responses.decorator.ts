@@ -77,3 +77,46 @@ export const ApiMeOperation = () =>
       schema: { example: { statusCode: 401, message: 'No token provided' } },
     }),
   );
+export class RefreshTokenDto {
+  @ApiProperty()
+  refreshToken: string;
+}
+
+export class RefreshResponseDto {
+  @ApiProperty({ description: 'New access token' })
+  accessToken: string;
+}
+
+export const ApiRefreshTokenOperation = () =>
+  applyDecorators(
+    ApiOperation({
+      summary: 'Refresh access token',
+      description:
+        'Generates a new access token using the refresh token stored in HTTP-only cookies. The new refresh token is automatically set as a cookie.',
+    }),
+    ApiResponse({
+      status: 200,
+      description: 'New access token generated successfully',
+      type: RefreshResponseDto,
+    }),
+    ApiResponse({
+      status: 401,
+      description: 'Invalid or missing refresh token',
+      schema: {
+        example: {
+          statusCode: 401,
+          message: 'No refresh token provided',
+        },
+      },
+    }),
+    ApiResponse({
+      status: 401,
+      description: 'Refresh token validation failed',
+      schema: {
+        example: {
+          statusCode: 401,
+          message: 'Invalid refresh token',
+        },
+      },
+    }),
+  );
