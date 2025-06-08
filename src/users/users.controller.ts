@@ -61,7 +61,7 @@ export class UsersController {
   }
 
   @ApiOperation({
-    summary: 'Create a new user',
+    summary: 'Retrieve all users',
     description: 'Only users with the ADMIN role can access this endpoint.',
   })
   @ApiGetAllUsersResponses()
@@ -78,7 +78,7 @@ export class UsersController {
   }
 
   @ApiOperation({
-    summary: 'Create a new user',
+    summary: 'Retrieve user by ID',
     description: 'Only users with the ADMIN role can access this endpoint.',
   })
   @ApiParam({ name: 'id', type: 'number' })
@@ -92,7 +92,7 @@ export class UsersController {
   }
 
   @ApiOperation({
-    summary: 'Update user',
+    summary: 'Update user information',
     description:
       'Requires role: ADMIN or USER. The USER can only update their own information.',
   })
@@ -120,7 +120,7 @@ export class UsersController {
   }
 
   @ApiOperation({
-    summary: 'Create a new user',
+    summary: 'Delete user by ID',
     description: 'Only users with the ADMIN role can access this endpoint.',
   })
   @ApiParam({ name: 'id', type: 'number' })
