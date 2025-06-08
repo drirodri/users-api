@@ -9,6 +9,8 @@ import {
   ClassSerializerInterceptor,
   UseInterceptors,
   UseGuards,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -50,6 +52,7 @@ export class UsersController {
   @ApiBody({ type: CreateUserDto })
   @ApiCreateUserResponses()
   @Post()
+  @HttpCode(HttpStatus.CREATED)
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserType.ADMIN)
   async create(@Body() createUserDto: CreateUserDto) {
@@ -66,6 +69,7 @@ export class UsersController {
   })
   @ApiGetAllUsersResponses()
   @Get()
+  @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserType.ADMIN)
   async findAll() {
@@ -84,6 +88,7 @@ export class UsersController {
   @ApiParam({ name: 'id', type: 'number' })
   @ApiUserCrudResponses()
   @Get(':id')
+  @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserType.ADMIN)
   async findOne(@Param('id') id: string) {
@@ -103,6 +108,7 @@ export class UsersController {
   @ApiBody({ type: UpdateUserDto })
   @ApiUpdateUserResponses()
   @Patch(':id')
+  @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserType.ADMIN, UserType.USER)
   async update(
@@ -129,6 +135,7 @@ export class UsersController {
   @ApiParam({ name: 'id', type: 'number' })
   @ApiUserCrudResponses()
   @Delete(':id')
+  @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserType.ADMIN)
   async remove(@Param('id') id: string) {
