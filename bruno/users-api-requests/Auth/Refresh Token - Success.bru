@@ -1,7 +1,7 @@
 meta {
   name: Refresh Token - Success
   type: http
-  seq: 8
+  seq: 21
 }
 
 post {
@@ -12,6 +12,7 @@ post {
 
 headers {
   Content-Type: application/json
+  Cookie: refreshToken={{refreshToken}}
 }
 
 assert {
@@ -43,4 +44,5 @@ tests {
 docs {
   Test successful token refresh using a valid refresh token cookie.
   Requires a valid refresh token cookie to be set (usually from a previous login).
+  Run "Login and Refresh Flow" first to get a valid refresh token stored in {{refreshToken}}.
 }
