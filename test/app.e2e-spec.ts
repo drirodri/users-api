@@ -43,7 +43,6 @@ function extractRefreshTokenCookie(
     cookie.startsWith('refreshToken='),
   );
 
-  // Return just the token value, not the full cookie string
   return refreshCookie?.split('=')[1]?.split(';')[0];
 }
 
@@ -60,7 +59,6 @@ describe('AppController (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
 
-    // Add cookie parser middleware
     app.use(cookieParser());
 
     await app.init();
