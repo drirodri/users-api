@@ -28,6 +28,12 @@ export class UsersService {
       userExists,
     );
 
+    this.userValidator.validatePasswordStrength(
+      createUserDto.password,
+      createUserDto.email,
+      createUserDto.name,
+    );
+
     const hashedPassword = await this.cryptoHelper.hashPassword(
       createUserDto.password,
     );
@@ -78,6 +84,12 @@ export class UsersService {
     }
 
     if (updateUserDto.password) {
+      this.userValidator.validatePasswordStrength(
+        updateUserDto.password,
+        updateUserDto.email || user.email,
+        updateUserDto.name || user.name,
+      );
+
       await this.userValidator.validateNewPassword(
         updateUserDto.password,
         user.password,
