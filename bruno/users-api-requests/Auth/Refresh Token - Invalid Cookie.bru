@@ -1,0 +1,34 @@
+meta {
+  name: Refresh Token - Invalid Cookie
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/auth/refresh
+  body: none
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Cookie: refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjk5OSwiaWF0IjoxNjAwMDAwMDAwLCJleHAiOjE2MDAwMDAwMDB9.invalid_signature_here
+}
+
+assert {
+  res.status: eq 401
+  res.body.message: eq "Invalid refresh token"
+}
+
+tests {
+  test("should fail with invalid refresh token", function() {
+    expect(res.status).to.equal(401);
+    expect(res.body).to.have.property('message');
+    expect(res.body.message).to.equal('Invalid refresh token');
+  });
+}
+
+docs {
+  Test refresh token endpoint with an invalid refresh token cookie.
+  Should return 401 Unauthorized with appropriate error message.
+}

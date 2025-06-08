@@ -1,0 +1,34 @@
+meta {
+  name: Refresh Token - Malformed Cookie
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{baseUrl}}/auth/refresh
+  body: none
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Cookie: refreshToken=malformed-token-without-jwt-structure
+}
+
+assert {
+  res.status: eq 401
+  res.body.message: eq "Invalid refresh token"
+}
+
+tests {
+  test("should fail with malformed refresh token", function() {
+    expect(res.status).to.equal(401);
+    expect(res.body).to.have.property('message');
+    expect(res.body.message).to.equal('Invalid refresh token');
+  });
+}
+
+docs {
+  Test refresh token endpoint with a malformed refresh token cookie.
+  Should return 401 Unauthorized.
+}

@@ -1,0 +1,78 @@
+meta {
+  name: Refresh Token - Use Stored Token
+  type: http
+  seq: 13
+}
+
+post {
+  url: {{baseUrl}}/auth/refresh
+  body: none
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Cookie: refreshToken={{refreshToken}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.accessToken: isDefined
+}
+
+script:post-response {
+  if (res.status === 200) {
+    // Extract new refresh token from Set-Cookie header
+    const setCookieHeader = res.headers['set-cookie'];
+    let newRefreshToken = null;
+    
+    if (Array.isArray(setCookieHeader)) {
+      const refreshCookie = setCookieHeader.find(cookie => cookie.startsWith('refreshToken='));
+      if (refreshCookie) {
+        newRefreshToken = refreshCookie.split('=')[1].split(';')[0];
+      }
+    } else if (setCookieHeader && setCookieHeader.includes('refreshToken=')) {
+      newRefreshToken = setCookieHeader.split('refreshToken=')[1].split(';')[0];
+    }
+    
+    if (newRefreshToken) {
+      bru.setVar("refreshToken", newRefreshToken);
+      console.log("New refresh token extracted and stored");
+    }
+    
+    // Store new access token
+    if (res.body.accessToken) {
+      bru.setVar("accessToken", res.body.accessToken);
+      console.log("New access token stored");
+    }
+  }
+}
+
+tests {
+  test("should refresh token successfully", function() {
+    expect(res.status).to.equal(200);
+    expect(res.body).to.have.property('accessToken');
+    expect(res.body.accessToken).to.be.a('string');
+    expect(res.body.accessToken).to.not.be.empty;
+  });
+  
+  test("should provide new refresh token cookie", function() {
+    const setCookieHeader = res.headers['set-cookie'];
+    expect(setCookieHeader).to.exist;
+    
+    let hasRefreshToken = false;
+    if (Array.isArray(setCookieHeader)) {
+      hasRefreshToken = setCookieHeader.some(cookie => cookie.includes('refreshToken='));
+    } else {
+      hasRefreshToken = setCookieHeader.includes('refreshToken=');
+    }
+    
+    expect(hasRefreshToken).to.be.true;
+  });
+}
+
+docs {
+  Test refresh token using a stored refresh token from a previous login.
+  Run "Login and Refresh Flow" first to get a valid refresh token.
+  This will also update the stored refresh token with the new one.
+}

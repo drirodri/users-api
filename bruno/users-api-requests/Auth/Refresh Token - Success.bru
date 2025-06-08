@@ -1,0 +1,46 @@
+meta {
+  name: Refresh Token - Success
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/auth/refresh
+  body: none
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+assert {
+  res.status: eq 200
+  res.body.accessToken: isDefined
+}
+
+tests {
+  test("should return new access token", function() {
+    expect(res.status).to.equal(200);
+    expect(res.body).to.have.property('accessToken');
+    expect(res.body.accessToken).to.be.a('string');
+    expect(res.body.accessToken).to.not.be.empty;
+  });
+  
+  test("should set new refresh token cookie", function() {
+    const setCookieHeader = res.headers['set-cookie'];
+    expect(setCookieHeader).to.exist;
+    
+    if (Array.isArray(setCookieHeader)) {
+      const refreshCookie = setCookieHeader.find(cookie => cookie.includes('refreshToken='));
+      expect(refreshCookie).to.exist;
+    } else {
+      expect(setCookieHeader).to.include('refreshToken=');
+    }
+  });
+}
+
+docs {
+  Test successful token refresh using a valid refresh token cookie.
+  Requires a valid refresh token cookie to be set (usually from a previous login).
+}
