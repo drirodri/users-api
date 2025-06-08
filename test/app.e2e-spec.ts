@@ -70,7 +70,7 @@ describe('AppController (e2e)', () => {
 
     userRepository = dataSource.getRepository(User);
 
-    const hashedPassword = await bcrypt.hash('admin123', 10);
+    const hashedPassword = await bcrypt.hash('SecureP@ss2024!', 10);
     await userRepository.save({
       name: 'System Administrator',
       email: 'admin@example.com',
@@ -80,7 +80,7 @@ describe('AppController (e2e)', () => {
 
     const res = await request(app.getHttpServer())
       .post('/auth/login')
-      .send({ email: 'admin@example.com', password: 'admin123' });
+      .send({ email: 'admin@example.com', password: 'SecureP@ss2024!' });
 
     const body = res.body as AuthResult;
     adminToken = body.accessToken;
@@ -94,7 +94,7 @@ describe('AppController (e2e)', () => {
   it('/auth/login (POST) - success', async () => {
     const res = await request(app.getHttpServer())
       .post('/auth/login')
-      .send({ email: 'admin@example.com', password: 'admin123' })
+      .send({ email: 'admin@example.com', password: 'SecureP@ss2024!' })
       .expect(200);
 
     const body = res.body as AuthResult;
@@ -132,7 +132,7 @@ describe('AppController (e2e)', () => {
       .send({
         name: 'Test User',
         email: 'testuser@example.com',
-        password: 'password123',
+        password: 'TestP@ss2024!',
         role: UserType.USER,
       })
       .expect(201);
@@ -149,7 +149,7 @@ describe('AppController (e2e)', () => {
       .send({
         name: 'Another User',
         email: 'testuser@example.com',
-        password: 'password123',
+        password: 'AnotherP@ss2024!',
         role: UserType.USER,
       })
       .expect(409);
@@ -161,7 +161,7 @@ describe('AppController (e2e)', () => {
       .send({
         name: 'No Auth User',
         email: 'noauth@example.com',
-        password: 'password123',
+        password: 'NoAuthP@ss2024!',
         role: UserType.USER,
       })
       .expect(401);
@@ -204,7 +204,7 @@ describe('AppController (e2e)', () => {
       .send({
         name: 'Delete Me',
         email: 'deleteme@example.com',
-        password: 'password123',
+        password: 'DeleteP@ss2024!',
         role: UserType.USER,
       })
       .expect(201);
@@ -235,14 +235,14 @@ describe('AppController (e2e)', () => {
       .send({
         name: 'Regular User',
         email: 'regular@example.com',
-        password: 'password123',
+        password: 'StrongP@ss2024!',
         role: UserType.USER,
       })
       .expect(201);
 
     const loginRes = await request(app.getHttpServer())
       .post('/auth/login')
-      .send({ email: 'regular@example.com', password: 'password123' })
+      .send({ email: 'regular@example.com', password: 'StrongP@ss2024!' })
       .expect(200);
 
     const body = loginRes.body as AuthResult;
@@ -269,7 +269,7 @@ describe('AppController (e2e)', () => {
     it('should refresh token successfully with valid refresh token cookie', async () => {
       const loginRes = await request(app.getHttpServer())
         .post('/auth/login')
-        .send({ email: 'admin@example.com', password: 'admin123' })
+        .send({ email: 'admin@example.com', password: 'SecureP@ss2024!' })
         .expect(200);
 
       const loginBody = loginRes.body as AuthResult;
@@ -318,7 +318,7 @@ describe('AppController (e2e)', () => {
     it('should work with new access token from refresh', async () => {
       const loginRes = await request(app.getHttpServer())
         .post('/auth/login')
-        .send({ email: 'admin@example.com', password: 'admin123' })
+        .send({ email: 'admin@example.com', password: 'SecureP@ss2024!' })
         .expect(200);
 
       const refreshTokenCookie = extractRefreshTokenCookie(loginRes.headers);
@@ -347,7 +347,7 @@ describe('AppController (e2e)', () => {
         .send({
           name: 'Temp User',
           email: 'temp@example.com',
-          password: 'password123',
+          password: 'ComplexP@ss2024!',
           role: UserType.USER,
         })
         .expect(201);
@@ -356,7 +356,7 @@ describe('AppController (e2e)', () => {
 
       const loginRes = await request(app.getHttpServer())
         .post('/auth/login')
-        .send({ email: 'temp@example.com', password: 'password123' })
+        .send({ email: 'temp@example.com', password: 'ComplexP@ss2024!' })
         .expect(200);
 
       const refreshTokenCookie = extractRefreshTokenCookie(loginRes.headers);
