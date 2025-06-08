@@ -1,13 +1,14 @@
 import { applyDecorators } from '@nestjs/common';
 import {
-  ApiOkResponse,
   ApiBadRequestResponse,
-  ApiUnauthorizedResponse,
-  ApiForbiddenResponse,
-  ApiNotFoundResponse,
   ApiConflictResponse,
   ApiExtraModels,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+
 import { UserResponseDto } from '../../users/dto/user-response.dto';
 
 export const ApiStandardResponses = (): MethodDecorator & ClassDecorator =>

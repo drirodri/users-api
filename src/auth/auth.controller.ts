@@ -9,20 +9,21 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import {
+  Request as ExpressRequest,
+  Response as ExpressResponse,
+} from 'express';
+
+import { AUTH_CONFIG } from './config/auth.config';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './guards/auth.guard';
 import { RequestWithUser } from './types/auth.types';
-import { ApiTags } from '@nestjs/swagger';
 import {
   ApiLoginOperation,
   ApiMeOperation,
   ApiRefreshTokenOperation,
 } from '../common/decorators/api-auth-responses.decorator';
-import {
-  Request as ExpressRequest,
-  Response as ExpressResponse,
-} from 'express';
-import { AUTH_CONFIG } from './config/auth.config';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -30,8 +31,8 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @ApiLoginOperation()
-  @HttpCode(HttpStatus.OK)
   @Post('login')
+  @HttpCode(HttpStatus.OK)
   async login(
     @Body() input: { email: string; password: string },
     @Res() res: ExpressResponse,
@@ -56,15 +57,15 @@ export class AuthController {
   }
 
   @ApiMeOperation()
-  @UseGuards(AuthGuard)
   @Get('me')
+  @UseGuards(AuthGuard)
   getUserInfo(@Req() request: RequestWithUser) {
     return request.user;
   }
 
+  @ApiRefreshTokenOperation()
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  @ApiRefreshTokenOperation()
   async refresh(@Req() req: ExpressRequest, @Res() res: ExpressResponse) {
     const cookies = req.cookies as Record<string, string> | undefined;
     const refreshToken = cookies?.refreshToken;
