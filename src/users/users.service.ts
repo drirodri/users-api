@@ -1,15 +1,16 @@
 import {
   Injectable,
-  NotFoundException,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
+
+import { UserType } from '../common/enums/user-type.enum';
+import { CryptoHelper } from '../common/helpers/crypto.helper';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
-import { UserType } from '../common/enums/user-type.enum';
 import { UsersRepository } from './repositories/users.repository';
 import { UserValidator } from './validators/user.validator';
-import { CryptoHelper } from '../common/helpers/crypto.helper';
 
 @Injectable()
 export class UsersService {

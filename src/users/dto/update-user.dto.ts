@@ -1,17 +1,18 @@
-import { PartialType, OmitType } from '@nestjs/mapped-types';
+import { OmitType, PartialType } from '@nestjs/mapped-types';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  IsEmail,
   IsEnum,
   IsOptional,
-  IsEmail,
   IsString,
-  MinLength,
-  MaxLength,
-  Matches,
   IsStrongPassword,
+  Matches,
+  MaxLength,
+  MinLength,
 } from 'class-validator';
-import { CreateUserDto } from './create-user.dto';
+
 import { UserType } from '../../common/enums/user-type.enum';
+import { CreateUserDto } from './create-user.dto';
 
 export class UpdateUserDto extends PartialType(
   OmitType(CreateUserDto, ['password'] as const),

@@ -2,15 +2,16 @@ import 'reflect-metadata';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsEmail,
-  IsNotEmpty,
-  IsString,
-  MinLength,
-  MaxLength,
   IsEnum,
+  IsNotEmpty,
   IsOptional,
-  Matches,
+  IsString,
   IsStrongPassword,
+  Matches,
+  MaxLength,
+  MinLength,
 } from 'class-validator';
+
 import { UserType } from '../../common/enums/user-type.enum';
 
 export class CreateUserDto {

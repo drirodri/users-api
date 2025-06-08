@@ -1,48 +1,49 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
-  Delete,
   ClassSerializerInterceptor,
-  UseInterceptors,
-  UseGuards,
+  Controller,
+  Delete,
+  Get,
   HttpCode,
   HttpStatus,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { UserResponseDto } from './dto/user-response.dto';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiExtraModels,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { plainToClass } from 'class-transformer';
+
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';
 import { CurrentUser } from 'src/auth/user.decorator';
 import { UserType } from 'src/common/enums/user-type.enum';
 import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiTags,
-  ApiParam,
-  ApiBody,
-  ApiExtraModels,
-} from '@nestjs/swagger';
-import {
   ApiCreateUserResponses,
+  ApiGetAllUsersResponses,
   ApiUpdateUserResponses,
   ApiUserCrudResponses,
-  ApiGetAllUsersResponses,
 } from '../common/decorators/api-responses.decorator';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UserResponseDto } from './dto/user-response.dto';
+import { UsersService } from './users.service';
 
-@ApiBearerAuth()
 @ApiTags('users')
+@ApiBearerAuth()
 @ApiExtraModels(UserResponseDto)
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
-@UseGuards(AuthGuard) // Apply authentication to entire controller
+@UseGuards(AuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

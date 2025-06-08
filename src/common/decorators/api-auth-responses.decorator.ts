@@ -1,10 +1,10 @@
 import { applyDecorators } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
   ApiProperty,
+  ApiResponse,
 } from '@nestjs/swagger';
 
 export class LoginDto {

@@ -1,5 +1,6 @@
-import { Exclude, Expose } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { Exclude, Expose } from 'class-transformer';
+
 import { UserType } from '../../common/enums/user-type.enum';
 
 export class UserResponseDto {
