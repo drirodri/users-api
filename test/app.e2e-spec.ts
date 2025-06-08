@@ -9,6 +9,7 @@ import { UserType } from '../src/common/enums/user-type.enum';
 import * as bcrypt from 'bcrypt';
 import { UserResponseDto } from 'src/users/dto/user-response.dto';
 import { AuthResult } from 'src/auth/auth.service';
+import * as cookieParser from 'cookie-parser';
 
 interface UserApiResponse {
   message: string;
@@ -25,6 +26,27 @@ interface MessageResponse {
   message: string;
 }
 
+function extractRefreshTokenCookie(
+  headers: Record<string, string | string[]>,
+): string | undefined {
+  const setCookieHeader = headers['set-cookie'];
+
+  if (!setCookieHeader) {
+    return undefined;
+  }
+
+  const cookies = Array.isArray(setCookieHeader)
+    ? setCookieHeader
+    : [setCookieHeader];
+
+  const refreshCookie = cookies.find((cookie: string) =>
+    cookie.startsWith('refreshToken='),
+  );
+
+  // Return just the token value, not the full cookie string
+  return refreshCookie?.split('=')[1]?.split(';')[0];
+}
+
 describe('AppController (e2e)', () => {
   let app: INestApplication;
   let dataSource: DataSource;
@@ -37,6 +59,10 @@ describe('AppController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+
+    // Add cookie parser middleware
+    app.use(cookieParser());
+
     await app.init();
 
     dataSource = app.get(DataSource);
@@ -235,5 +261,115 @@ describe('AppController (e2e)', () => {
       .get('/auth/me')
       .set('Authorization', 'Bearer invalid.token.here')
       .expect(401);
+  });
+
+  describe('/auth/refresh (POST)', () => {
+    it('should refresh token successfully with valid refresh token cookie', async () => {
+      const loginRes = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({ email: 'admin@example.com', password: 'admin123' })
+        .expect(200);
+
+      const loginBody = loginRes.body as AuthResult;
+      const refreshTokenCookie = extractRefreshTokenCookie(loginRes.headers);
+
+      expect(refreshTokenCookie).toBeDefined();
+
+      if (!refreshTokenCookie) {
+        throw new Error('refreshTokenCookie is undefined');
+      }
+
+      const refreshRes = await request(app.getHttpServer())
+        .post('/auth/refresh')
+        .set('Cookie', `refreshToken=${refreshTokenCookie}`)
+        .expect(200);
+
+      const refreshBody = refreshRes.body as { accessToken: string };
+      expect(refreshBody).toHaveProperty('accessToken');
+      expect(typeof refreshBody.accessToken).toBe('string');
+      expect(refreshBody.accessToken).not.toBe(loginBody.accessToken);
+
+      const newRefreshCookie = extractRefreshTokenCookie(refreshRes.headers);
+      expect(newRefreshCookie).toBeDefined();
+    });
+
+    it('should fail with no refresh token cookie', async () => {
+      await request(app.getHttpServer()).post('/auth/refresh').expect(401);
+    });
+
+    it('should fail with invalid refresh token cookie', async () => {
+      await request(app.getHttpServer())
+        .post('/auth/refresh')
+        .set('Cookie', 'refreshToken=invalid.token.here')
+        .expect(401);
+    });
+
+    it('should fail with malformed refresh token cookie', async () => {
+      await request(app.getHttpServer())
+        .post('/auth/refresh')
+        .set('Cookie', 'refreshToken=malformed-token')
+        .expect(401);
+    });
+
+    it('should work with new access token from refresh', async () => {
+      const loginRes = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({ email: 'admin@example.com', password: 'admin123' })
+        .expect(200);
+
+      const refreshTokenCookie = extractRefreshTokenCookie(loginRes.headers);
+
+      if (!refreshTokenCookie) {
+        throw new Error('refreshTokenCookie is undefined');
+      }
+
+      const refreshRes = await request(app.getHttpServer())
+        .post('/auth/refresh')
+        .set('Cookie', `refreshToken=${refreshTokenCookie}`)
+        .expect(200);
+
+      const refreshBody = refreshRes.body as { accessToken: string };
+
+      await request(app.getHttpServer())
+        .get('/auth/me')
+        .set('Authorization', `Bearer ${refreshBody.accessToken}`)
+        .expect(200);
+    });
+
+    it('should fail when refresh token is used after user deletion', async () => {
+      const createRes = await request(app.getHttpServer())
+        .post('/users')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          name: 'Temp User',
+          email: 'temp@example.com',
+          password: 'password123',
+          role: UserType.USER,
+        })
+        .expect(201);
+
+      const tempUser = createRes.body as UserApiResponse;
+
+      const loginRes = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({ email: 'temp@example.com', password: 'password123' })
+        .expect(200);
+
+      const refreshTokenCookie = extractRefreshTokenCookie(loginRes.headers);
+
+      await request(app.getHttpServer())
+        .delete(`/users/${tempUser.data.id}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(200);
+
+      if (!refreshTokenCookie) {
+        throw new Error('refreshTokenCookie is undefined');
+      }
+
+      await request(app.getHttpServer())
+        .post('/auth/refresh')
+        .set('Cookie', `refreshToken=${refreshTokenCookie}`)
+        .expect(401);
+    });
   });
 });
