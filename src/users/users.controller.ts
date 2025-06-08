@@ -42,6 +42,7 @@ import {
 @ApiExtraModels(UserResponseDto)
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
+@UseGuards(AuthGuard) // Apply authentication to entire controller
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -53,7 +54,7 @@ export class UsersController {
   @ApiCreateUserResponses()
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(RolesGuard)
   @Roles(UserType.ADMIN)
   async create(@Body() createUserDto: CreateUserDto) {
     const user = await this.usersService.create(createUserDto);
@@ -70,7 +71,7 @@ export class UsersController {
   @ApiGetAllUsersResponses()
   @Get()
   @HttpCode(HttpStatus.OK)
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(RolesGuard)
   @Roles(UserType.ADMIN)
   async findAll() {
     const users = await this.usersService.findAll();
@@ -89,7 +90,7 @@ export class UsersController {
   @ApiUserCrudResponses()
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(RolesGuard)
   @Roles(UserType.ADMIN)
   async findOne(@Param('id') id: string) {
     const user = await this.usersService.findOne(+id);
@@ -109,7 +110,7 @@ export class UsersController {
   @ApiUpdateUserResponses()
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(RolesGuard)
   @Roles(UserType.ADMIN, UserType.USER)
   async update(
     @Param('id') id: string,
@@ -136,7 +137,7 @@ export class UsersController {
   @ApiUserCrudResponses()
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(RolesGuard)
   @Roles(UserType.ADMIN)
   async remove(@Param('id') id: string) {
     await this.usersService.remove(+id);
