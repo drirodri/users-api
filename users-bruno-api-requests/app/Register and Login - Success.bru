@@ -1,0 +1,40 @@
+meta {
+  name: Register and Login - Success
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/register
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Test User Flow",
+    "email": "testflow@example.com",
+    "password": "FlowTestP@ssw0rd!"
+  }
+}
+
+script:post-response {
+  if (res.getStatus() === 201) {
+    bru.setVar("registeredEmail", "testflow@example.com");
+    bru.setVar("registeredPassword", "FlowTestP@ssw0rd!");
+  }
+}
+
+tests {
+  test("Registration successful", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+  
+  test("User assigned USER role", function() {
+    expect(res.getBody().data.role).to.equal("user");
+  });
+}
