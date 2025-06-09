@@ -10,6 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { UserResponseDto } from 'src/users/dto/user-response.dto';
 import { AuthResult } from 'src/auth/auth.service';
 import * as cookieParser from 'cookie-parser';
+import { RegisterResponseDto } from 'src/auth/dto/register-response.dto';
 
 interface UserApiResponse {
   message: string;
@@ -372,6 +373,81 @@ describe('AppController (e2e)', () => {
         .post('/auth/refresh')
         .set('Cookie', `refreshToken=${refreshTokenCookie}`)
         .expect(401);
+    });
+  });
+
+  describe('/register (POST)', () => {
+    it('should register a new user successfully', async () => {
+      const registerData = {
+        name: 'New User',
+        email: 'newuser@example.com',
+        password: 'SecureP@ssw0rd!',
+      };
+
+      const res = await request(app.getHttpServer())
+        .post('/register')
+        .send(registerData)
+        .expect(201);
+
+      const body = res.body as RegisterResponseDto;
+      expect(body).toHaveProperty('message', 'User registered successfully');
+      expect(body).toHaveProperty('data');
+      expect(body.data).toHaveProperty('email', 'newuser@example.com');
+      expect(body.data).toHaveProperty('name', 'New User');
+      expect(body.data).toHaveProperty('role', UserType.USER);
+      expect(body.data).not.toHaveProperty('password');
+    });
+
+    it('should automatically assign USER role', async () => {
+      const registerData = {
+        name: 'Role Test User',
+        email: 'roletest@example.com',
+        password: 'StrongP@ssw0rd!',
+      };
+
+      const res = await request(app.getHttpServer())
+        .post('/register')
+        .send(registerData)
+        .expect(201);
+
+      const body = res.body as RegisterResponseDto;
+      expect(body.data).toHaveProperty('role', UserType.USER);
+    });
+
+    it('should allow registered user to login immediately', async () => {
+      const registerData = {
+        name: 'Login Test User',
+        email: 'logintest@example.com',
+        password: 'ComplexP@ssw0rd!',
+      };
+
+      await request(app.getHttpServer())
+        .post('/register')
+        .send(registerData)
+        .expect(201);
+
+      const loginRes = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          email: 'logintest@example.com',
+          password: 'ComplexP@ssw0rd!',
+        })
+        .expect(200);
+
+      expect(loginRes.body).toHaveProperty('accessToken');
+    });
+
+    it('should return 400 for validation errors', async () => {
+      const invalidData = {
+        name: '',
+        email: 'invalid-email',
+        password: '123',
+      };
+
+      await request(app.getHttpServer())
+        .post('/register')
+        .send(invalidData)
+        .expect(400);
     });
   });
 });
