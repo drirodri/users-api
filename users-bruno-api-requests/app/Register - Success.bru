@@ -1,0 +1,45 @@
+meta {
+  name: Register - Success
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/register
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "password": "SecureP@ssw0rd!"
+  }
+}
+
+tests {
+  test("Status code is 201", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+  
+  test("Response has success message", function() {
+    expect(res.getBody().message).to.equal("User registered successfully");
+  });
+  
+  test("Response contains user data", function() {
+    const body = res.getBody();
+    expect(body.data).to.have.property("email", "john.doe@example.com");
+    expect(body.data).to.have.property("name", "John Doe");
+    expect(body.data).to.have.property("role", "user");
+    expect(body.data).to.have.property("id");
+  });
+  
+  test("Password is not exposed in response", function() {
+    expect(res.getBody().data).to.not.have.property("password");
+  });
+}

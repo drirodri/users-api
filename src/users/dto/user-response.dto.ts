@@ -39,6 +39,9 @@ export class UserResponseDto {
   @Exclude()
   password: string;
 
+  @Exclude()
+  refreshToken: string;
+
   @ApiProperty({
     description: 'Date when the user was created',
     example: '2024-01-15T10:30:00Z',
