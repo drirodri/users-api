@@ -36,6 +36,9 @@ export class MeResponseDto {
   email: string;
 
   @ApiProperty()
+  name: string;
+
+  @ApiProperty()
   role: string;
 }
 

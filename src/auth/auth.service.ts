@@ -13,11 +13,13 @@ type AuthInput = {
 type SignInData = {
   userId: number;
   email: string;
+  name: string;
   role: UserType;
 };
 type PayloadData = {
   sub: number;
   email: string;
+  name: string;
   role: UserType;
 };
 export type AuthResult = {
@@ -50,6 +52,7 @@ export class AuthService {
       return {
         userId: user.id,
         email: user.email,
+        name: user.name,
         role: user.role,
       };
     }
@@ -61,6 +64,7 @@ export class AuthService {
       sub: user.userId,
       email: user.email,
       role: user.role,
+      name: user.name,
     };
     const accessToken = await this.jwtService.signAsync(tokenPayload, {
       expiresIn: AUTH_CONFIG.ACCESS_TOKEN_EXPIRES_IN,
@@ -106,6 +110,7 @@ export class AuthService {
       const signInData: SignInData = {
         userId: user.id,
         email: user.email,
+        name: user.name,
         role: user.role,
       };
 
